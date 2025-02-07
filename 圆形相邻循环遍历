@@ -1,0 +1,36 @@
+#include<stdio.h>
+#include<string.h>
+
+int main() {
+    char cards[15][3] = {"2","3","4","5","6","7","8","9","10","J","Q","K","A","2","3"};
+    char input[3][3];
+    int found = 0;
+
+    // 读取三个输入
+    for (int i = 0; i < 3; i++) {
+        scanf("%s", input[i]);
+    }
+
+    // 遍历所有可能的连续三元组
+    for (int j = 0; j <= 12; j++) { 
+        // 检查三个输入是否都在当前三元组中
+        int match_count = 0;
+        for (int k = 0; k < 3; k++) { // 遍历每个输入牌
+            // 检查当前输入牌是否在cards[j], cards[j+1], cards[j+2]中
+            for (int m = 0; m < 3; m++) { 
+                if (strcmp(input[k], cards[j+m]) == 0) {
+                    match_count++;
+                    break;
+                }
+            }
+        }
+        // 如果三个牌都匹配当前三元组
+        if (match_count == 3) {
+            found = 1;
+            break;
+        }
+    }
+
+    puts(found ? "Yes" : "No");
+    return 0;
+}
