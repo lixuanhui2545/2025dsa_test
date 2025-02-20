@@ -60,5 +60,5 @@ void max2(int A[], int lo, int hi, int& x1, int& x2) {
         x2 = (A[x1L] > A[x2R])? x1L : x2R;
     }
 }
-//https://www.doubao.com/thread/w315e48b0ea5b9df
+
 
