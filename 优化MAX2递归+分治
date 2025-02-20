@@ -38,3 +38,13 @@ void max2(int A[], int lo, int hi, int& x1, int& x2) {
     updateMax(A, x1, x2, (x1 == x1L)? x2L : x2R);
     updateMax(A, x1, x2, (x1 == x1L)? x1R : x1L);
 }
+//test
+int main() {
+    int A[] = {5, 3, 8, 1, 9, 2};
+    int n = sizeof(A) / sizeof(A[0]);
+    int x1, x2;
+    max2(A, 0, n, x1, x2);
+    std::cout << "最大的数是 A[" << x1 << "] = " << A[x1] << std::endl;
+    std::cout << "第二大的数是 A[" << x2 << "] = " << A[x2] << std::endl;
+    return 0;
+}
