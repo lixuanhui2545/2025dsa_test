@@ -1,0 +1,207 @@
+#include <iostream>
+#include <cstdlib>
+#include <ctime>
+
+// 交换两个整数的值
+void swap(int& a, int& b) {
+    int temp = a;
+    a = b;
+    b = temp;
+}
+
+// 0
+// 起泡排序算法（版本0）
+// 功能：对数组A中的前n个元素进行排序
+// 时间复杂度：最坏情况下为O(n^2)，因为每一趟都需要遍历几乎整个数组，且需要进行n - 1趟
+// 特点：这是一个蛮力算法，不能及时提前退出，总是必须做n - 1趟扫描交换
+void bubblesort(int A[], int n) { 
+    // 在尚未确认已全局排序之前，逐趟进行扫描交换
+    while (n--) { 
+        // 自左向右逐对检查当前范围A[0, n)内的各相邻元素
+        for (int i = 0; i < n; i++) { 
+            // 一旦A[i]与A[i + 1]逆序，则进行交换
+            if (A[i] > A[i + 1]) { 
+                // 交换相邻元素A[i]和A[i + 1]的位置
+                swap(A[i], A[i + 1]); 
+            }
+        }
+    }
+} 
+
+// 1a
+// 起泡排序算法（版本1A）
+// 功能：对数组A中的前n个元素进行排序
+// 时间复杂度：最坏情况下为O(n^2)，但在部分有序的情况下可能提前结束，优于版本0
+// 特点：借助布尔型标志位sorted，可及时提前退出，而不致总是蛮力地做n - 1趟扫描交换
+void bubblesort1A(int A[], int n) { 
+    // 整体排序标志，首先假定尚未排序
+    bool sorted = false; 
+    // 在尚未确认已全局排序之前，逐趟进行扫描交换
+    while (!sorted) { 
+        // 假定已经排序
+        sorted = true; 
+        // 自左向右逐对检查当前范围A[0, n)内的各相邻元素
+        for (int i = 1; i < n; i++) { 
+            // 一旦A[i - 1]与A[i]逆序，则进行交换
+            if (A[i - 1] > A[i]) { 
+                // 交换相邻元素A[i - 1]和A[i]的位置
+                swap(A[i - 1], A[i]); 
+                // 因整体排序不能保证，需要清除排序标志
+                sorted = false; 
+            }
+        }
+        // 至此末元素必然就位，故可以缩短待排序序列的有效长度
+        n--; 
+    }
+} 
+
+// 1b
+// 起泡排序算法（版本1B，与版本1A完全等价）
+// 功能：对数组A中的前n个元素进行排序
+// 时间复杂度：最坏情况下为O(n^2)，在部分有序时可提前结束
+// 特点：借助布尔型标志位sorted，可及时提前退出，而不致总是蛮力地做n - 1趟扫描交换
+// 不足：对尾部有序（或接近有序）的输入，算法依然亦步亦趋地收敛，导致元素比较次数过多
+void bubblesort1B(int A[], int n) { 
+    // 在尚未确认已全局排序之前，逐趟进行扫描交换
+    for (bool sorted = false; sorted =!sorted; n--) { 
+        // 自左向右逐对检查当前范围A[0, n)内的各相邻元素
+        for (int i = 1; i < n; i++) { 
+            // 一旦A[i - 1]与A[i]逆序，则进行交换
+            if (A[i - 1] > A[i]) { 
+                // 交换相邻元素A[i - 1]和A[i]的位置
+                swap(A[i - 1], A[i]); 
+                // 因整体排序不能保证，需要清除排序标志
+                sorted = false; 
+            }
+        }
+    }
+} 
+
+// 2
+// 起泡排序算法（版本2）
+// 功能：对数组A中的前n个元素进行排序
+// 时间复杂度：最坏情况下为O(n^2)，但对于尾部有序（或接近有序）的输入，收敛速度更快
+// 特点：借助整数m尽快地收缩待排序区间，既可提前退出，更可减少每趟（及所有）扫描交换中元素比较操作
+// 说明：元素交换的次数仅取决于输入序列，与版本0和版本1相同
+void bubblesort2(int A[], int n) { 
+    // 在尚未确认已全局排序之前，逐趟进行扫描交换
+    for (int m; 1 < n; n = m) { 
+        // 自左向右逐对检查当前范围A[0, m)内的各相邻元素
+        // 初始时m = 1，后续根据交换情况更新m
+        for (int i = m = 1; i < n; i++) { 
+            // 一旦A[i - 1]与A[i]逆序，则进行交换
+            if (A[i - 1] > A[i]) { 
+                // 交换相邻元素A[i - 1]和A[i]的位置
+                swap(A[i - 1], A[i]); 
+                // 更新待排序区间的长度，记录最后一次交换的位置
+                m = i; 
+            }
+        }
+    }
+} 
+
+// 打乱数组元素顺序
+void shuffle(int A[], int n) {
+    for (int i = n - 1; i > 0; i--) {
+        int j = rand() % (i + 1);
+        swap(A[i], A[j]);
+    }
+}
+
+// 构造随机数组（可根据测试需要相应地改写）
+// 功能：生成一个包含n个元素的随机数组A
+// 参数：A - 用于存储随机数组的指针；n - 数组的长度；seed - 随机数种子
+// 说明：该函数先将数组初始化为0到n - 1的有序序列，然后使用shuffle函数打乱顺序
+void randomArray(int A[], int n, int seed) {
+    // 设置随机数种子
+    srand(seed);
+    // 初始化数组元素为0到n - 1的有序序列
+    for (int i = 0; i < n; i++) A[i] = i;
+    // 打乱数组元素的顺序
+    shuffle(A, n);
+}
+
+// 打印数组元素
+void print(int A[], int n) {
+    for (int i = 0; i < n; i++) {
+        std::cout << A[i] << " ";
+    }
+    std::cout << std::endl;
+}
+
+// 起泡排序测试程序
+// 功能：测试不同版本的起泡排序算法
+// 参数：argc - 命令行参数的数量；argv - 命令行参数数组
+// 返回值：程序退出状态码，0表示正常退出
+int main(int argc, char* argv[]) {
+    // 检查命令行参数是否足够
+    if (2 > argc) {
+        // 若参数不足，输出使用说明并退出程序
+        std::cout << "Usage: " << argv[0] << " <size of test>" << std::endl;
+        return 1;
+    }
+    // 将命令行参数转换为整数作为数组的长度
+    int n = atoi(argv[1]);
+    // 确保数组长度为非负数
+    if (n < 0) n = 0; 
+    // 动态分配一个长度为n的整数数组
+    int* A = new int[n]; 
+    // 获取当前时间作为随机数种子，用于保证不同算法使用相同的随机数组
+    unsigned int seed = (unsigned int)time(NULL); 
+
+    // 测试起泡排序算法版本0
+    std::cout << "\n== Bubblesort algorithm #0 ========" << std::endl;
+    // 生成一个随机数组
+    randomArray(A, n, seed); 
+    // 输出排序前的数组
+    std::cout << "-->  ";
+    print(A, n);
+    // 使用版本0的起泡排序算法对数组进行排序
+    bubblesort(A, n); 
+    // 输出排序后的数组
+    std::cout << "==>  ";
+    print(A, n);
+
+    // 测试起泡排序算法版本1A
+    std::cout << "\n== Bubblesort algorithm #1A ========" << std::endl;
+    // 生成一个随机数组
+    randomArray(A, n, seed); 
+    // 输出排序前的数组
+    std::cout << "-->  ";
+    print(A, n);
+    // 使用版本1A的起泡排序算法对数组进行排序
+    bubblesort1A(A, n); 
+    // 输出排序后的数组
+    std::cout << "==>  ";
+    print(A, n);
+
+    // 测试起泡排序算法版本1B
+    std::cout << "\n== Bubblesort algorithm #1B ========" << std::endl;
+    // 生成一个随机数组
+    randomArray(A, n, seed); 
+    // 输出排序前的数组
+    std::cout << "-->  ";
+    print(A, n);
+    // 使用版本1B的起泡排序算法对数组进行排序
+    bubblesort1B(A, n); 
+    // 输出排序后的数组
+    std::cout << "==>  ";
+    print(A, n);
+
+    // 测试起泡排序算法版本2
+    std::cout << "\n== Bubblesort algorithm #2 ========" << std::endl;
+    // 生成一个随机数组
+    randomArray(A, n, seed); 
+    // 输出排序前的数组
+    std::cout << "-->  ";
+    print(A, n);
+    // 使用版本2的起泡排序算法对数组进行排序
+    bubblesort2(A, n); 
+    // 输出排序后的数组
+    std::cout << "==>  ";
+    print(A, n);
+
+    // 释放动态分配的数组内存
+    delete[] A;
+    return 0;
+}
