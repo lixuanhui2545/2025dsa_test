@@ -1,0 +1,72 @@
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+// 返回两个整数中的最大值
+int max(int a, int b) {
+    return (a > b)? a : b;
+}
+
+// 计算最长公共子序列的长度并构建具体序列
+void LCS(const char *A, const char *B) {
+    int m = strlen(A);
+    int n = strlen(B);
+    int dp[m + 1][n + 1];
+
+    // 初始化 dp 数组
+    for (int i = 0; i <= m; i++) {
+        for (int j = 0; j <= n; j++) {
+            if (i == 0 || j == 0) {
+                dp[i][j] = 0;
+            } else if (A[i - 1] == B[j - 1]) {
+                dp[i][j] = dp[i - 1][j - 1] + 1;
+            } else {
+                dp[i][j] = max(dp[i - 1][j], dp[i][j - 1]);
+            }
+        }
+    }
+
+    // 获取最长公共子序列的长度
+    int length = dp[m][n];
+
+    // 动态分配存储最长公共子序列的内存
+    char *lcs = (char *)malloc((length + 1) * sizeof(char));
+    lcs[length] = '\0';
+
+    // 回溯构建最长公共子序列
+    int i = m, j = n, index = length - 1;
+    while (i > 0 && j > 0) {
+        if (A[i - 1] == B[j - 1]) {
+            lcs[index] = A[i - 1];
+            i--;
+            j--;
+            index--;
+        } else if (dp[i - 1][j] > dp[i][j - 1]) {
+            i--;
+        } else {
+            j--;
+        }
+    }
+
+    // 输出结果
+    printf("最长公共子序列的长度是: %d\n", length);
+    printf("最长公共子序列是: %s\n", lcs);
+
+    // 释放内存
+    free(lcs);
+}
+
+int main() {
+    const char *A = "ABCBDAB";
+    const char *B = "BDCABA";
+    LCS(A, B);
+    return 0;
+}
+/*
+在 LCS 函数中，在计算出 dp 数组后，通过回溯操作从 dp[m][n] 开始，根据 dp 数组的值和字符是否相等来确定最长公共子序列的每个字符，存储在 lcs 字符串中。
+最后输出最长公共子序列的长度和具体序列，并释放动态分配的内存。
+复杂度分析
+时间复杂度：仍然是o(m*n) ，主要是填充 dp 数组和回溯操作的时间开销。
+空间复杂度：除了 dp 数组的 o(m*n)  空间，还额外使用了长度为最长公共子序列长度的空间来存储结果，整体空间复杂度还是o(m*n)  。
+*/
+
