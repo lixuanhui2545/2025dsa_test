@@ -1,0 +1,39 @@
+#include <iostream>
+#include <string>
+
+// 递归函数求最长公共子序列
+std::string LCS(const std::string& A, const std::string& B) {
+    if (A.empty() || B.empty()) {
+        return "";  // 若其中一个字符串为空，最长公共子序列为空字符串
+    }
+    if (A.back() == B.back()) {  // 如果两个字符串的最后一个字符相同
+        return LCS(A.substr(0, A.length() - 1), B.substr(0, B.length() - 1)) + A.back();
+    } else {  // 如果最后一个字符不同
+        std::string lcs1 = LCS(A.substr(0, A.length() - 1), B);
+        std::string lcs2 = LCS(A, B.substr(0, B.length() - 1));
+        return lcs1.length() > lcs2.length()? lcs1 : lcs2;
+    }
+}
+
+int main() {
+    std::string A = "didactiC advanT";
+    std::string B = "didactic advan";
+    std::string result = LCS(A, B);
+    std::cout << "最长公共子序列是: " << result << std::endl;
+    return 0;
+}
+/*
+代码解释
+头文件包含：
+<iostream> 用于输入输出操作，这里主要是输出结果。
+<string> 用于处理字符串。
+LCS函数：
+递归终止条件：当字符串A或B为空时，直接返回空字符串"" ，表示没有公共子序列。
+字符相同情况：如果A和B的最后一个字符相等，那么这个字符一定是最长公共子序列的一部分。通过递归调用去掉最后一个字符的子串（A.substr(0, A.length() - 1) 和 B.substr(0, B.length() - 1) ），然后将该相同字符追加到递归结果后返回。
+字符不同情况：当最后一个字符不相等时，分别递归计算去掉A最后一个字符后的子串与B的 LCS（LCS(A.substr(0, A.length() - 1), B) ），
+以及A与去掉B最后一个字符后的子串的 LCS（LCS(A, B.substr(0, B.length() - 1)) ）。最后比较这两个结果的长度，返回较长的那个字符串。
+main函数：
+定义两个字符串A和B。
+调用LCS函数计算最长公共子序列，并将结果存储在result中。
+输出最终得到的最长公共子序列。
+*/
