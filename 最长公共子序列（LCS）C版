@@ -1,0 +1,91 @@
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+// 函数用于返回两个整数中的较大值
+int max(int a, int b) {
+    return (a > b)? a : b;
+}
+
+// 递归函数求最长公共子序列的长度
+int LCSLength(const char *A, const char *B, int m, int n) {
+    if (m == 0 || n == 0) {
+        return 0;  // 若其中一个字符串长度为 0，最长公共子序列长度为 0
+    }
+    if (A[m - 1] == B[n - 1]) {
+        return 1 + LCSLength(A, B, m - 1, n - 1);  // 若最后一个字符相同，长度加 1 并递归计算
+    } else {
+        return max(LCSLength(A, B, m - 1, n), LCSLength(A, B, m, n - 1));  // 取两种情况的最大值
+    }
+}
+
+// 函数用于构造最长公共子序列
+void constructLCS(const char *A, const char *B, int m, int n, int **dp, char *lcs, int index) {
+    if (m == 0 || n == 0) {
+        return;
+    }
+    if (A[m - 1] == B[n - 1]) {
+        constructLCS(A, B, m - 1, n - 1, dp, lcs, index - 1);
+        lcs[index] = A[m - 1];
+    } else if (dp[m - 1][n] >= dp[m][n - 1]) {
+        constructLCS(A, B, m - 1, n, dp, lcs, index);
+    } else {
+        constructLCS(A, B, m, n - 1, dp, lcs, index);
+    }
+}
+
+// 函数用于求最长公共子序列
+char* LCS(const char *A, const char *B) {
+    int m = strlen(A);
+    int n = strlen(B);
+
+    // 创建动态规划表
+    int **dp = (int **)malloc((m + 1) * sizeof(int *));
+    for (int i = 0; i <= m; i++) {
+        dp[i] = (int *)malloc((n + 1) * sizeof(int));
+    }
+
+    // 填充动态规划表
+    for (int i = 0; i <= m; i++) {
+        for (int j = 0; j <= n; j++) {
+            if (i == 0 || j == 0) {
+                dp[i][j] = 0;
+            } else if (A[i - 1] == B[j - 1]) {
+                dp[i][j] = 1 + dp[i - 1][j - 1];
+            } else {
+                dp[i][j] = max(dp[i - 1][j], dp[i][j - 1]);
+            }
+        }
+    }
+
+    // 获取最长公共子序列的长度
+    int length = dp[m][n];
+
+    // 分配存储最长公共子序列的内存
+    char *lcs = (char *)malloc((length + 1) * sizeof(char));
+    lcs[length] = '\0';
+
+    // 构造最长公共子序列
+    constructLCS(A, B, m, n, dp, lcs, length - 1);
+
+    // 释放动态规划表的内存
+    for (int i = 0; i <= m; i++) {
+        free(dp[i]);
+    }
+    free(dp);
+
+    return lcs;
+}
+
+int main() {
+    const char *A = "didactiC advanT";
+    const char *B = "didactic advan";
+
+    char *result = LCS(A, B);
+    printf("最长公共子序列是: %s\n", result);
+
+    // 释放存储最长公共子序列的内存
+    free(result);
+
+    return 0;
+}
