@@ -1,0 +1,37 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+int main() {
+    char input;
+    // 读取输入的大写字母
+    scanf("%c", &input);
+
+    // 计算字母对应的序号（A 为 1，B 为 2，以此类推）
+    int n = input - 'A' + 1;
+
+    // 遍历每一行，总共 2 * n - 1 行
+    for (int i = 0; i < 2 * n - 1; i++) {
+        // 计算当前行对应的字母数量
+        int letterCount = n - abs(n - 1 - i);
+
+        // 输出左侧字母
+        for (int j = 0; j < letterCount; j++) {
+            printf("%c", 'A' + letterCount - 1);
+        }
+
+        // 输出中间空格
+        for (int k = 0; k < 2 * abs(n - 1 - i); k++) {
+            printf(" ");
+        }
+
+        // 输出右侧字母
+        for (int j = 0; j < letterCount; j++) {
+            printf("%c", 'A' + letterCount - 1);
+        }
+
+        // 换行
+        printf("\n");
+    }
+
+    return 0;
+}
