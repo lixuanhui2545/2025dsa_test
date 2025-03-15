@@ -1,0 +1,29 @@
+#include<cstdio>
+using namespace std;
+struct Listnode {
+	int val;
+	Listnode* next;
+	Listnode(int x) :val(x), next(NULL) {}
+};
+class Solution {
+public:
+	Listnode* merge(Listnode* l1, Listnode* l2) {
+		auto dummy = new Listnode(-1);
+		auto cur = dummy;
+		while (l1 && l2) {
+			if (l1->val < l2->val) {
+				cur->next = l1;
+				cur = l1;//cur要往后移
+				l1 = l1->next;
+			}//把l1放到新链表的下一位
+			else {
+				cur->next = l2;
+				cur = l2;
+				l2 = l2->next;
+			}
+			if (l1)cur->next = l1;
+			else cur->next = l2;
+			return dummy->next;
+		}
+	}
+};
