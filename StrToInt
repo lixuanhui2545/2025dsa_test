@@ -1,21 +1,51 @@
 class Solution {
 public:
-    int strToInt(string str) {
-        int k=0;
-        while( k<str.size() && str[k]==' ' )k++;
-        long long res=0;
-        while(k<str.size()&&str[k]>='0'&&str[k]<='9'){
-            res=res*10+str[k]-'0';
-            if(res>INT_MAX){
-                res=INT_MAX;
-                break;
-            }
-            if(res<INT_MAX){
-                res=INT_MAX;
-                break;
-            }
-            
+    int strToInt(string s) {
+        s += '\0';
+        int i = 0;
+        while(s[i] == ' ') ++i;
+        long ret = 0;
+        bool isPos = false;
+        if(s[i] == '-' || s[i] == '+'){
+            if(s[i] == '-') isPos = true;
+            ++i;
+        } 
+        while(s[i] >= '0' && s[i] <= '9'){
+            ret = ret * 10 + s[i] - '0';
+            ++i;
+            if(!isPos && ret >= INT32_MAX) return INT32_MAX;
+            if(isPos && ret - 1 >= INT32_MAX) return INT32_MIN; 
         }
-        return res;
+        return isPos ? -ret : ret;
+    }
+};
+
+
+
+
+
+#include <climits>
+#include <string>
+
+class Solution {
+public:
+    int strToInt(std::string s) {
+        int i = 0, n = s.size();
+        // 跳过前导空格
+        while (i < n && s[i] == ' ') ++i;
+        // 处理符号
+        int sign = 1;
+        if (i < n && (s[i] == '+' || s[i] == '-')) {
+            sign = (s[i++] == '-') ? -1 : 1;
+        }
+        long res = 0;
+        // 转换数字
+        while (i < n && isdigit(s[i])) {
+            res = res * 10 + (s[i++] - '0');
+            // 处理溢出
+            if (res * sign > INT_MAX) return INT_MAX;
+            if (res * sign < INT_MIN) return INT_MIN;
+        }
+        return res * sign;
     }
 };
