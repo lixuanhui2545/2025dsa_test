@@ -1,0 +1,184 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+
+// 地图大小
+#define MAP_HEIGHT 10
+#define MAP_WIDTH 10
+
+// 游戏元素定义
+#define WALL 1
+#define BOX 2
+#define PLAYER 3
+#define TARGET 4
+#define EMPTY 0
+
+// 地图数据结构
+int map[MAP_HEIGHT][MAP_WIDTH];
+
+// 玩家位置
+int playerX;
+int playerY;
+
+// 箱子坐标数组
+int boxX[6]; // 6 个箱子
+int boxY[6];
+
+// 生成地图
+void generateMap() {
+    srand((unsigned int)time(NULL));
+
+    // 初始化地图为空地
+    for (int i = 0; i < MAP_HEIGHT; i++) {
+        for (int j = 0; j < MAP_WIDTH; j++) {
+            map[i][j] = EMPTY;
+        }
+    }
+
+    // 放置墙
+    for (int i = 0; i < MAP_HEIGHT; i += 2) {
+        for (int j = 0; j < MAP_WIDTH; j += 2) {
+            if (i == 0 || i == MAP_HEIGHT - 1 || j == 0 || j == MAP_WIDTH - 1) {
+                map[i][j] = WALL;
+            } else {
+                int randomWall = rand() % 3;
+                if (randomWall == 0) {
+                    map[i][j] = WALL;
+                }
+            }
+        }
+    }
+
+    // 放置目标位置
+    int targetCount = (MAP_WIDTH * MAP_HEIGHT) / 10;
+    int targetPlaced = 0;
+    for (int i = 0; i < MAP_HEIGHT && targetPlaced < targetCount; i++) {
+        for (int j = 0; j < MAP_WIDTH && targetPlaced < targetCount; j++) {
+            if (map[i][j]!= WALL) {
+                map[i][j] = TARGET;
+                targetPlaced++;
+            }
+        }
+    }
+
+    // 放置箱子
+    int boxCount = 6;
+    int boxPlaced = 0;
+    for (int i = 0; i < MAP_HEIGHT && boxPlaced < boxCount; i++) {
+        for (int j = 0; j < MAP_WIDTH && boxPlaced < boxCount; j++) {
+            if (map[i][j]!= WALL && map[i][j]!= TARGET) {
+                map[i][j] = BOX;
+                boxX[boxPlaced] = j;
+                boxY[boxPlaced] = i;
+                boxPlaced++;
+            }
+        }
+    }
+
+    // 放置玩家
+    do {
+        playerX = rand() % MAP_WIDTH;
+        playerY = rand() % MAP_HEIGHT;
+    } while (map[playerY][playerX] == WALL || map[playerY][playerX] == BOX || map[playerY][playerX] == TARGET);
+    map[playerY][playerX] = PLAYER;
+}
+
+// 打印地图
+void printMap() {
+    for (int i = 0; i < MAP_HEIGHT; i++) {
+        for (int j = 0; j < MAP_WIDTH; j++) {
+            printf("%d ", map[i][j]);
+        }
+        printf("\n");
+    }
+}
+
+// 游戏主循环
+int main() {
+    generateMap();
+
+    while (1) {
+        printMap();
+        printf("输入移动方向(0 - 上, 1 - 下, 2 - 左, 3 - 右): ");
+        int direction;
+        scanf("%d", &direction);
+
+        int targetX = playerX;
+        int targetY = playerY;
+        int boxIndex = -1;
+
+        switch (direction) {
+            case 0: // 上
+                targetY--;
+                break;
+            case 1: // 下
+                targetY++;
+                break;
+            case 2: // 左
+                targetX--;
+                break;
+            case 3: // 右
+                targetX++;
+                break;
+        }
+
+        // 检查玩家前方是否有箱子
+        for (int i = 0; i < 6; i++) {
+            if (boxX[i] == targetX && boxY[i] == targetY) {
+                boxIndex = i;
+                break;
+            }
+        }
+
+        if (boxIndex!= -1) {
+            // 箱子前方的目标位置
+            int boxTargetX = boxX[boxIndex];
+            int boxTargetY = boxY[boxIndex];
+            switch (direction) {
+                case 0: // 上
+                    boxTargetY--;
+                    break;
+                case 1: // 下
+                    boxTargetY++;
+                    break;
+                case 2: // 左
+                    boxTargetX--;
+                    break;
+                case 3: // 右
+                    boxTargetX++;
+                    break;
+            }
+
+            // 检查箱子能否被推动
+            if (map[boxTargetY][boxTargetX] == EMPTY || map[boxTargetY][boxTargetX] == TARGET) {
+                map[boxY[boxIndex]][boxX[boxIndex]] = EMPTY;
+                map[boxTargetY][boxTargetX] = BOX;
+                boxX[boxIndex] = boxTargetX;
+                boxY[boxIndex] = boxTargetY;
+            }
+        }
+
+        // 移动玩家
+        if ((map[targetY][targetX] == EMPTY || map[targetY][targetX] == TARGET) && boxIndex == -1) {
+            map[playerY][playerX] = EMPTY;
+            map[targetY][targetX] = PLAYER;
+            playerX = targetX;
+            playerY = targetY;
+        }
+
+        // 检查游戏是否胜利
+        int win = 1;
+        for (int i = 0; i < 6; i++) {
+            if (map[boxY[i]][boxX[i]]!= TARGET) {
+                win = 0;
+                break;
+            }
+        }
+        if (win) {
+            printf("恭喜你，游戏胜利！\n");
+            break;
+        }
+    }
+
+    return 0;
+}
