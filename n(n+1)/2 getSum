@@ -1,0 +1,17 @@
+class Solution {
+public:
+    int getSum(int n) {
+        int res = n;
+        // 利用逻辑与的短路特性来终止递归
+        n > 0 && (res += getSum(n - 1));
+        return res;
+    }
+};
+
+class Solution {
+public:
+    int getSum(int n) {
+        char a[n][n+1];
+        return sizeof(a)>>1;
+    }
+};
